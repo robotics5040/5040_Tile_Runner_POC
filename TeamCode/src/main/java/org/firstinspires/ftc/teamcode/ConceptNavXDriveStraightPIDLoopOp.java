@@ -60,18 +60,14 @@ import java.text.DecimalFormat;
 @TeleOp(name = "Concept: navX Drive Straight PID - Loop", group = "Concept")
 // @Disabled Comment this in to remove this from the Driver Station OpMode List
 public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
-    DcMotor leftMotor;
-    DcMotor rightMotor;
 
     /* This is the port on the Core Device Interface Module        */
     /* in which the navX-Model Device is connected.  Modify this  */
     /* depending upon which I2C port you are using.               */
-    private final int NAVX_DIM_I2C_PORT = 0;
-    private AHRS navx_device;
+    HardwareTileRunnerRobot  robot   = new HardwareTileRunnerRobot();
+
     private navXPIDController yawPIDController;
     private ElapsedTime runtime = new ElapsedTime();
-
-    private final byte NAVX_DEVICE_UPDATE_RATE_HZ = 50;
 
     private final double TARGET_ANGLE_DEGREES = 0.0;
     private final double TOLERANCE_DEGREES = 2.0;
@@ -88,15 +84,8 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
 
     @Override
     public void init() {
-        leftMotor = hardwareMap.dcMotor.get("left motor");
-        rightMotor = hardwareMap.dcMotor.get("right motor");
 
-        navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
-                NAVX_DIM_I2C_PORT,
-                AHRS.DeviceDataType.kProcessedData,
-                NAVX_DEVICE_UPDATE_RATE_HZ);
-
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        robot.init(hardwareMap);
 
         /* If possible, use encoders when driving, as it results in more */
         /* predictable drive system response.                           */
@@ -104,7 +93,7 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
         //rightMotor.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
         /* Create a PID Controller which uses the Yaw Angle as input. */
-        yawPIDController = new navXPIDController( navx_device,
+        yawPIDController = new navXPIDController( robot.navx_device,
                 navXPIDController.navXTimestampedDataSource.YAW);
 
         /* Configure the PID controller */
@@ -126,7 +115,7 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
     public void start() {
         /* reset the navX-Model device yaw angle so that whatever direction */
         /* it is currently pointing will be zero degrees.                   */
-        navx_device.zeroYaw();
+        robot.navx_device.zeroYaw();
         yawPIDResult = new navXPIDController.PIDResult();
     }
 
@@ -138,9 +127,9 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
             navX-Micro has not been able to calibrate successfully, hold off using
             the navX-Micro Yaw value until calibration is complete.
              */
-            calibration_complete = !navx_device.isCalibrating();
+            calibration_complete = !robot.navx_device.isCalibrating();
             if ( calibration_complete ) {
-                navx_device.zeroYaw();
+                robot.navx_device.zeroYaw();
             } else {
                 telemetry.addData("navX-Micro", "Startup Calibration in Progress");
             }
@@ -154,14 +143,12 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
 
             if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
                 if (yawPIDResult.isOnTarget()) {
-                    leftMotor.setPower(drive_speed);
-                    rightMotor.setPower(drive_speed);
+                    robot.setDrivePower(drive_speed,drive_speed);
                     telemetry.addData("Motor Output", df.format(drive_speed) + ", " +
                             df.format(drive_speed));
                 } else {
                     double output = yawPIDResult.getOutput();
-                    leftMotor.setPower(limit(drive_speed + output));
-                    rightMotor.setPower(limit(drive_speed - output));
+                    robot.setDrivePower(limit(drive_speed + output),limit(drive_speed - output));
                     telemetry.addData("Motor Output", df.format(limit(drive_speed + output)) + ", " +
                             df.format(limit(drive_speed - output)));
                 }
@@ -170,12 +157,12 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
                 /* the loop() function was invoked.  Therefore, there's no */
                 /* need to update the motors at this time.                 */
             }
-            telemetry.addData("Yaw", df.format(navx_device.getYaw()));
+            telemetry.addData("Yaw", df.format(robot.navx_device.getYaw()));
         }
     }
 
     @Override
     public void stop() {
-        navx_device.close();
+        robot.navx_device.close();
     }
 }

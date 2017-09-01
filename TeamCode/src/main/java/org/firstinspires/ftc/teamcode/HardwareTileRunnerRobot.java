@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.kauailabs.navx.ftc.AHRS;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -30,14 +31,18 @@ public class HardwareTileRunnerRobot
     public DcMotor rightMotor1 = null;
     public DcMotor rightMotor2 = null;
     public static final String MESSAGETAG = "5040MSG";
+    private final int NAVX_DIM_I2C_PORT = 0;
+    private final byte NAVX_DEVICE_UPDATE_RATE_HZ = 50;
+    public AHRS navx_device;
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
+    HardwareMap hwMap;
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
     public HardwareTileRunnerRobot(){
 
+        hwMap = null;
     }
 
     /* Initialize standard Hardware interfaces */
@@ -65,10 +70,17 @@ public class HardwareTileRunnerRobot
 
             // Set all motors to run without encoders.
             // May want to use RUN_USING_ENCODERS if encoders are installed.
-            leftMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            leftMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rightMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            leftMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            // Enable NavX Sensor
+
+            navx_device = AHRS.getInstance(hwMap.deviceInterfaceModule.get("dim"),
+                    NAVX_DIM_I2C_PORT,
+                    AHRS.DeviceDataType.kProcessedData,
+                    NAVX_DEVICE_UPDATE_RATE_HZ);
         } catch (Exception e) {
 
             RobotLog.ee(MESSAGETAG,e.getMessage());
