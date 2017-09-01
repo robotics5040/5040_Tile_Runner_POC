@@ -59,7 +59,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="TileRunner: Auto Drive By Time", group="TileRunner")
-@Disabled
+//@Disabled
 public class TileRunnerAutoDriveByTime_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
