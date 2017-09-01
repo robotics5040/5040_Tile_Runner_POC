@@ -11,7 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * This is NOT an opmode.
  *
  * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a Tile Runner.
+ * In this case that robot is a Tile Runner.  The Tile Runner is setup with two motors
+ * on each side.  This version assumes each motor is connected to an individual port.
  *
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are lower case and some have single spaces between words.
