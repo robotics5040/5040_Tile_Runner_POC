@@ -34,6 +34,7 @@ import android.util.Log;
 
 import com.kauailabs.navx.ftc.AHRS;
 import com.kauailabs.navx.ftc.navXPIDController;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -57,7 +58,7 @@ import java.text.DecimalFormat;
  * to reduce the frequency of the updates to the drive system.
  */
 
-@TeleOp(name = "Concept: navX Drive Straight PID - Loop", group = "Concept")
+@Autonomous(name = "Concept: navX Drive Straight PID - Loop", group = "Concept")
 // @Disabled Comment this in to remove this from the Driver Station OpMode List
 public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
 
@@ -70,10 +71,10 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     private final double TARGET_ANGLE_DEGREES = 0.0;
-    private final double TOLERANCE_DEGREES = 2.0;
+    private final double TOLERANCE_DEGREES = 1.0;
     private final double MIN_MOTOR_OUTPUT_VALUE = -1.0;
     private final double MAX_MOTOR_OUTPUT_VALUE = 1.0;
-    private final double YAW_PID_P = 0.005;
+    private final double YAW_PID_P = 0.007;
     private final double YAW_PID_I = 0.0;
     private final double YAW_PID_D = 0.0;
 
@@ -148,7 +149,7 @@ public class ConceptNavXDriveStraightPIDLoopOp extends OpMode {
                             df.format(drive_speed));
                 } else {
                     double output = yawPIDResult.getOutput();
-                    robot.setDrivePower(limit(drive_speed + output),limit(drive_speed - output));
+                    robot.setDrivePower(limit(drive_speed - output),limit(drive_speed + output));
                     telemetry.addData("Motor Output", df.format(limit(drive_speed + output)) + ", " +
                             df.format(limit(drive_speed - output)));
                 }

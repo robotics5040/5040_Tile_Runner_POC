@@ -55,9 +55,9 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  */
 
 @TeleOp(name="Pushbot: Teleop Tank", group="Pushbot")
-@Disabled
+//@Disabled
 public class TileRunner_Iterative extends OpMode{
-
+    private double position = 0.0;
     /* Declare OpMode members. */
     private HardwareTileRunnerRobot robot; // use the class created to define a Pushbot's hardware
 
@@ -99,18 +99,67 @@ public class TileRunner_Iterative extends OpMode{
      */
     @Override
     public void loop() {
-        double left;
-        double right;
+        double left_stick, right_stick, power, left_trigger, right_trigger;
+        boolean left_bumper, right_bumper, a_button, b_button, x_button, y_button;
+
+
+
+
+
 
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_stick_y;
-        right = -gamepad1.right_stick_y;
-        robot.setDrivePower(left,right);
+        left_stick = -gamepad1.left_stick_y;
+        right_stick = -gamepad1.right_stick_y;
+        left_bumper = gamepad1.left_bumper;
+        right_bumper = gamepad1.right_bumper;
+        left_trigger = gamepad1.left_trigger;
+        right_trigger = gamepad1.right_trigger;
+        a_button = gamepad1.a;
+        b_button = gamepad1.b;
+        x_button = gamepad1.x;
+        y_button = gamepad1.y;
+
+
+
+        power = 1;
+        if(left_trigger > 0.5 ) {
+
+            left_stick = left_stick* -1;
+            power = 0.5;
+        }
+
+
+        if(right_trigger > 0.7) {
+
+                right_stick = right_stick* -1;
+                power = 0.7;
+        }
+        if (right_bumper == true){
+            position++;
+
+        }
+        if  (left_bumper == true) {
+            position--;
+        }
+
+        robot.servo_one.setPosition(position);
+        robot.setDrivePower(left_stick*power,right_stick*power);
 
         // Send telemetry message to signify robot running;
-        telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right);
+
+        telemetry.addLine("Controller One Telemetry:");
+        telemetry.addData("left stick: ",  "%.2f", left_stick);
+        telemetry.addData("right stick: ", "%.2f", right_stick);
+        telemetry.addData("Left Bumper: ", left_bumper);
+        telemetry.addData("Right Bumper: ", right_bumper );
+        telemetry.addData("Left Trigger: ", left_trigger);
+        telemetry.addData("Right Trigger: ", right_trigger);
+        telemetry.addData("A Button: ",a_button);
+        telemetry.addData("B Button: ",b_button);
+        telemetry.addData("X Button: ",x_button);
+        telemetry.addData("Y Button: ", y_button);
     }
+
 
     /*
      * Code to run ONCE after the driver hits STOP
